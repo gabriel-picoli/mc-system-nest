@@ -14,6 +14,8 @@ import '@event-calendar/core/index.css'
 import styled from 'styled-components'
 import { v4 as uuidv4 } from 'uuid'
 
+import Modal from '../modal/Modal'
+
 const StyledWrapper = styled.div`
    display: flex;
    flex-direction: column;
@@ -84,29 +86,60 @@ interface Event {
 }
 
 export default function Schedule() {
-   const [events, setEvents] = useState<Event[]>([])
+   const [events, setEvents] = useState<Event[]>([]) // lista de eventos
+   const [showModal, setShowModal] = useState<boolean>(false) // mostra o modal
+   const [selectedDate, setSelectedDate] = useState<Date | null>(null) // data selecionada
+   const [selectedResourceId, setSelectedResourceId] = useState<string | null>(null) // resourceId selecionado
+   const [eventTitle, setEventTitle] = useState<string>('') // titulo do evento
+   const [service, setService] = useState<string>('')
 
    const ecRef = useRef<any>(null) // referencia para a agenda
 
    const resources = Array.from({ length: 3 }, (_, i) => ({ id: String(i + 1), title: 'gab' }))
 
+   // clique na agenda
    const handleDateClick = (info: DateClickInfo) => {
-      const start = new Date(info.date)
-      const end = new Date(start.getTime() + 60 * 60 * 1000) // Adiciona 1 hora de duração
+      const clickedDate = new Date(info.date)
       const resourceId = info.resource.id
 
-      const newEvent: Event = {
-         id: uuidv4(),
-         title: 'evento teste',
-         start,
-         end,
-         backgroundColor: `${(props: { theme: { colors: { primary: string } } }) => props.theme.colors.primary}`,
-         resourceId,
+      setSelectedDate(clickedDate)
+      setSelectedResourceId(resourceId)
+      setShowModal(true)
+   }
+
+   // salvar eventos e adicionar a agenda
+   const saveEvent = (e: React.FormEvent) => {
+      e.preventDefault()
+
+      if (eventTitle && selectedDate && selectedResourceId) {
+         const newEvent: Event = {
+            id: uuidv4(),
+            title: `${eventTitle} - ${service}`,
+            start: selectedDate,
+            end: new Date(selectedDate.getTime() + 60 * 60 * 1000),
+            backgroundColor: `${(props: { theme: { colors: { primary: string } } }) => props.theme.colors.primary}`,
+            resourceId: selectedResourceId,
+         }
+
+         setEvents((prevEvents) => [...prevEvents, newEvent])
+         
+         setEventTitle('')
+         setService('')
+         setSelectedDate(null)
+         setSelectedResourceId(null)
+
+         console.log(newEvent.id)
       }
+   }
 
-      setEvents((prevEvents) => [...prevEvents, newEvent])
+   const handleEventClick = () => {
+      console.log('event click')
+   }
 
-      console.log(newEvent)
+   // fecha o modal
+   const handleCloseModal = () => {
+      setShowModal(false)
+      setSelectedDate(null)
    }
 
    // atualiza a agenda quando a lista de eventos muda
@@ -145,6 +178,7 @@ export default function Schedule() {
                events,
                resources,
                dateClick: handleDateClick,
+               eventClick: handleEventClick,
             },
          },
       })
@@ -152,7 +186,32 @@ export default function Schedule() {
 
    return (
       <StyledWrapper>
-         <StyledCalendarWrapper id="ec" className="allAgenda" />
+         <StyledCalendarWrapper id="ec" className="allAgenda">
+            {showModal && (
+               <Modal isOpen onClose={handleCloseModal} title="Agendamento">
+                  <div>
+                     <input
+                        type="text"
+                        id="eventTitle"
+                        placeholder="nome"
+                        value={eventTitle}
+                        onChange={(e) => setEventTitle(e.target.value)}
+                     />
+                     <input
+                        type="text"
+                        id="service"
+                        placeholder="serviço"
+                        value={service}
+                        onChange={(e) => setService(e.target.value)}
+                     />
+
+                     <button type="submit" onClick={saveEvent}>
+                        salvar
+                     </button>
+                  </div>
+               </Modal>
+            )}
+         </StyledCalendarWrapper>
       </StyledWrapper>
    )
 }
