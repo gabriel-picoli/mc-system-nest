@@ -91,7 +91,7 @@ export default function Schedule() {
    const [selectedDate, setSelectedDate] = useState<Date | null>(null) // data selecionada
    const [selectedResourceId, setSelectedResourceId] = useState<string | null>(null) // resourceId selecionado
    const [eventTitle, setEventTitle] = useState<string>('') // titulo do evento
-   const [service, setService] = useState<string>('')
+   const [service, setService] = useState<string>('') // serviço
 
    const ecRef = useRef<any>(null) // referencia para a agenda
 
@@ -107,7 +107,7 @@ export default function Schedule() {
       setShowModal(true)
    }
 
-   // salvar eventos e adicionar a agenda
+   // salvar eventos e adicionar na agenda
    const saveEvent = (e: React.FormEvent) => {
       e.preventDefault()
 
@@ -122,13 +122,11 @@ export default function Schedule() {
          }
 
          setEvents((prevEvents) => [...prevEvents, newEvent])
-         
+
          setEventTitle('')
          setService('')
          setSelectedDate(null)
          setSelectedResourceId(null)
-
-         console.log(newEvent.id)
       }
    }
 
