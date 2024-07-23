@@ -15,6 +15,8 @@ import styled from 'styled-components'
 import { v4 as uuidv4 } from 'uuid'
 
 import Modal from '../modal/Modal'
+import Input from '../inputs/Input'
+import Button from '../inputs/Button'
 
 const StyledWrapper = styled.div`
    display: flex;
@@ -28,7 +30,6 @@ const StyledCalendarWrapper = styled.div`
    flex: 1;
    overflow: hidden;
    border-radius: 11px;
-   box-shadow: 0 0 10px rgba(0, 0, 0);
    width: 1300px;
 
    .ec {
@@ -66,6 +67,10 @@ const StyledCalendarWrapper = styled.div`
    .ec-event {
       background-color: ${(props) => props.theme.colors.primary};
    }
+`
+const Form = styled.div`
+   display: flex;
+   flex-direction: column;
 `
 
 interface DateClickInfo {
@@ -187,15 +192,15 @@ export default function Schedule() {
          <StyledCalendarWrapper id="ec" className="allAgenda">
             {showModal && (
                <Modal isOpen onClose={handleCloseModal} title="Agendamento">
-                  <div>
-                     <input
+                  <Form>
+                     <Input
                         type="text"
                         id="eventTitle"
                         placeholder="nome"
                         value={eventTitle}
                         onChange={(e) => setEventTitle(e.target.value)}
                      />
-                     <input
+                     <Input
                         type="text"
                         id="service"
                         placeholder="serviço"
@@ -203,10 +208,10 @@ export default function Schedule() {
                         onChange={(e) => setService(e.target.value)}
                      />
 
-                     <button type="submit" onClick={saveEvent}>
+                     <Button type="submit" onClick={saveEvent}>
                         salvar
-                     </button>
-                  </div>
+                     </Button>
+                  </Form>
                </Modal>
             )}
          </StyledCalendarWrapper>
